@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Users, Eye, MousePointer, Calendar, 
   LogOut, Plus, Settings, BarChart3,
-  ExternalLink, MessageCircle
+  ExternalLink, MessageCircle, Pencil
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -187,14 +187,15 @@ const Dashboard = () => {
                     <p className="text-sm text-muted-foreground mb-4">{artist.genre}</p>
                     
                     <div className="flex gap-2">
-                      <Link 
-                        to={`/artista/${artist.slug}`} 
-                        target="_blank"
-                        className="flex-1"
-                      >
-                        <Button variant="outline" size="sm" className="w-full glass-button border-border/50">
-                          <ExternalLink className="w-3 h-3 mr-1" />
-                          Ver Página
+                      <Link to={`/dashboard/artista/${artist.slug}`} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full gold-gradient text-primary-foreground border-0">
+                          <Pencil className="w-3 h-3 mr-1" />
+                          Editar
+                        </Button>
+                      </Link>
+                      <Link to={`/artista/${artist.slug}`} target="_blank">
+                        <Button variant="outline" size="sm" className="glass-button border-border/50">
+                          <ExternalLink className="w-3 h-3" />
                         </Button>
                       </Link>
                       <Link to={`/contratante/${artist.slug}`} target="_blank">
@@ -202,9 +203,6 @@ const Dashboard = () => {
                           <MessageCircle className="w-3 h-3" />
                         </Button>
                       </Link>
-                      <Button variant="outline" size="sm" className="glass-button border-border/50">
-                        <Settings className="w-3 h-3" />
-                      </Button>
                     </div>
                   </div>
                 </div>

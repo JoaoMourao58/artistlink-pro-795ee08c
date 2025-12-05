@@ -9,6 +9,7 @@ import ArtistPage from "./pages/ArtistPage";
 import ContractorMode from "./pages/ContractorMode";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import ArtistEditor from "./pages/ArtistEditor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/contratante/:slug" element={<ContractorMode />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/artista/:slug" element={<ArtistEditor />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
