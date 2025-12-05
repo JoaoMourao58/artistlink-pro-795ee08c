@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
-import { useArtist, useArtistProjects, useArtistPhotos, useArtistVideos, Project, Photo, Video } from '@/hooks/useArtists';
+import { useArtist, useArtistProjects, useArtistPhotos, useArtistVideos, useArtistShows, Project, Photo, Video, Show } from '@/hooks/useArtists';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
@@ -25,9 +26,11 @@ import {
 import { SortableItem } from '@/components/dashboard/SortableItem';
 import { ProjectForm } from '@/components/dashboard/ProjectForm';
 import { MediaForm } from '@/components/dashboard/MediaForm';
+import { ShowForm } from '@/components/dashboard/ShowForm';
+import { ShowsCalendar } from '@/components/dashboard/ShowsCalendar';
 import { 
   ArrowLeft, Plus, Music, Image, Video as VideoIcon, 
-  ExternalLink, Clock, Users, Save, Eye
+  Calendar as CalendarIcon, Clock, Save, Eye
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -51,10 +54,12 @@ const ArtistEditor = () => {
   const { data: projects } = useArtistProjects(artist?.id || '');
   const { data: photos } = useArtistPhotos(artist?.id || '');
   const { data: videos } = useArtistVideos(artist?.id || '');
+  const { data: shows } = useArtistShows(artist?.id || '');
 
   const [localProjects, setLocalProjects] = useState<Project[]>([]);
   const [localPhotos, setLocalPhotos] = useState<Photo[]>([]);
   const [localVideos, setLocalVideos] = useState<Video[]>([]);
+  const [localShows, setLocalShows] = useState<Show[]>([]);
 
   const [projectFormOpen, setProjectFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -62,6 +67,9 @@ const ArtistEditor = () => {
   const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
   const [videoFormOpen, setVideoFormOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
+  const [showFormOpen, setShowFormOpen] = useState(false);
+  const [editingShow, setEditingShow] = useState<Show | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const [deleteDialog, setDeleteDialog] = useState<{ type: string; id: string } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -88,6 +96,10 @@ const ArtistEditor = () => {
   useEffect(() => {
     if (videos) setLocalVideos([...videos]);
   }, [videos]);
+
+  useEffect(() => {
+    if (shows) setLocalShows([...shows]);
+  }, [shows]);
 
   const handleDragEnd = (event: DragEndEvent, type: 'projects' | 'photos' | 'videos') => {
     const { active, over } = event;
@@ -222,6 +234,45 @@ const ArtistEditor = () => {
     }
   };
 
+  const handleSaveShow = async (data: any) => {
+    setSaving(true);
+    try {
+      if (editingShow) {
+        const { error } = await supabase
+          .from('shows')
+          .update(data)
+          .eq('id', editingShow.id);
+        if (error) throw error;
+        toast({ title: 'Show atualizado!' });
+      } else {
+        const { error } = await supabase
+          .from('shows')
+          .insert({ ...data, artist_id: artist?.id });
+        if (error) throw error;
+        toast({ title: 'Show criado!' });
+      }
+      setShowFormOpen(false);
+      setEditingShow(null);
+      setSelectedDate(null);
+      queryClient.invalidateQueries({ queryKey: ['shows', artist?.id] });
+    } catch (error) {
+      toast({ title: 'Erro ao salvar show', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSelectShowFromCalendar = (show: Show) => {
+    setEditingShow(show);
+    setShowFormOpen(true);
+  };
+
+  const handleSelectDateFromCalendar = (date: Date) => {
+    setSelectedDate(date);
+    setEditingShow(null);
+    setShowFormOpen(true);
+  };
+
   const handleDelete = async () => {
     if (!deleteDialog) return;
     setSaving(true);
@@ -289,6 +340,10 @@ const ArtistEditor = () => {
             <TabsTrigger value="videos" className="gap-2">
               <VideoIcon className="w-4 h-4" />
               Vídeos
+            </TabsTrigger>
+            <TabsTrigger value="agenda" className="gap-2">
+              <CalendarIcon className="w-4 h-4" />
+              Agenda
             </TabsTrigger>
           </TabsList>
 
@@ -472,6 +527,28 @@ const ArtistEditor = () => {
               </div>
             )}
           </TabsContent>
+
+          {/* Agenda Tab */}
+          <TabsContent value="agenda" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-xl font-bold">Agenda de Shows</h2>
+              <Button 
+                onClick={() => { setEditingShow(null); setSelectedDate(null); setShowFormOpen(true); }}
+                className="gold-gradient text-primary-foreground"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Novo Show
+              </Button>
+            </div>
+
+            <div className="glass-card p-6">
+              <ShowsCalendar
+                shows={localShows}
+                onSelectShow={handleSelectShowFromCalendar}
+                onSelectDate={handleSelectDateFromCalendar}
+              />
+            </div>
+          </TabsContent>
         </Tabs>
       </main>
 
@@ -507,6 +584,26 @@ const ArtistEditor = () => {
         type="video"
         initialData={editingVideo ? { url: editingVideo.url, title: editingVideo.title || '' } : null}
         onSave={handleSaveVideo}
+        loading={saving}
+      />
+
+      <ShowForm
+        open={showFormOpen}
+        onOpenChange={setShowFormOpen}
+        initialData={editingShow ? {
+          date: editingShow.date,
+          city: editingShow.city,
+          venue: editingShow.venue,
+          status: editingShow.status,
+          notes: editingShow.notes
+        } : selectedDate ? {
+          date: format(selectedDate, 'yyyy-MM-dd'),
+          city: '',
+          venue: '',
+          status: 'available',
+          notes: ''
+        } : null}
+        onSave={handleSaveShow}
         loading={saving}
       />
 
