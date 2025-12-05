@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 
 interface PressKitSectionProps {
   artistName: string;
-  pressKitUrl?: string;
+  pressKitUrl?: string | null;
 }
 
 export const PressKitSection = ({ artistName, pressKitUrl }: PressKitSectionProps) => {

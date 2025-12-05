@@ -1,7 +1,14 @@
 import { Calendar, MapPin, CheckCircle, Clock } from 'lucide-react';
-import { Show } from '@/data/artists';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+interface Show {
+  id: string;
+  date: string;
+  city: string;
+  venue: string;
+  status: 'confirmed' | 'available';
+}
 
 interface AgendaSectionProps {
   shows: Show[];

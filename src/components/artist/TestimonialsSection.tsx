@@ -1,5 +1,12 @@
 import { Quote } from 'lucide-react';
-import { Testimonial } from '@/data/artists';
+
+interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  text: string;
+  photo?: string | null;
+}
 
 interface TestimonialsSectionProps {
   testimonials: Testimonial[];

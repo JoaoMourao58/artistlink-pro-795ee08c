@@ -1,8 +1,18 @@
 import { Clock, Users, Music, ChevronRight } from 'lucide-react';
-import { Project } from '@/data/artists';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  videoUrl: string;
+  duration: string;
+  technicalInfo: string;
+  repertoire: string[];
+  photos: string[];
+}
 
 interface ProjectsSectionProps {
   projects: Project[];

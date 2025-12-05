@@ -1,9 +1,14 @@
 import { Play, MessageCircle } from 'lucide-react';
-import { Artist } from '@/data/artists';
 import { Button } from '@/components/ui/button';
 
 interface HeroSectionProps {
-  artist: Artist;
+  artist: {
+    name: string;
+    genre: string;
+    bio: string;
+    bannerUrl: string;
+    whatsappNumber: string;
+  };
 }
 
 export const HeroSection = ({ artist }: HeroSectionProps) => {
