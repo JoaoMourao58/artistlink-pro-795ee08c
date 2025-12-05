@@ -1,12 +1,11 @@
 import { Instagram, Youtube, Facebook, Globe, Music } from 'lucide-react';
-import { Artist } from '@/data/artists';
 
 interface SocialLinksProps {
-  socialLinks: Artist['socialLinks'];
+  socialLinks: Record<string, string>;
   artistName: string;
 }
 
-const socialIcons = {
+const socialIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   spotify: Music,
   instagram: Instagram,
   youtube: Youtube,
@@ -14,7 +13,7 @@ const socialIcons = {
   website: Globe,
 };
 
-const socialLabels = {
+const socialLabels: Record<string, string> = {
   spotify: 'Spotify',
   instagram: 'Instagram',
   youtube: 'YouTube',
@@ -41,8 +40,8 @@ export const SocialLinks = ({ socialLinks, artistName }: SocialLinksProps) => {
 
         <div className="flex flex-wrap justify-center gap-4">
           {links.map(([platform, url]) => {
-            const Icon = socialIcons[platform as keyof typeof socialIcons];
-            const label = socialLabels[platform as keyof typeof socialLabels];
+            const Icon = socialIcons[platform] || Globe;
+            const label = socialLabels[platform] || platform;
 
             return (
               <a

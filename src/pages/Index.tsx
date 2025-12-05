@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
-import { artists } from '@/data/artists';
-import { MessageCircle, Star, Calendar, Play, ArrowRight } from 'lucide-react';
+import { useArtists } from '@/hooks/useArtists';
+import { MessageCircle, Star, Calendar, Play, ArrowRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
+  const { data: artists, isLoading } = useArtists();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -44,7 +46,7 @@ const Index = () => {
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 md:gap-16 mb-16 animate-fade-up" style={{ animationDelay: '0.4s' }}>
             <div className="text-center">
-              <div className="font-display text-4xl md:text-5xl font-bold text-primary mb-2">15+</div>
+              <div className="font-display text-4xl md:text-5xl font-bold text-primary mb-2">{artists?.length || 0}+</div>
               <div className="text-muted-foreground text-sm uppercase tracking-wide">Artistas</div>
             </div>
             <div className="text-center">
@@ -57,7 +59,7 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="animate-fade-up" style={{ animationDelay: '0.5s' }}>
+          <div className="flex flex-wrap justify-center gap-4 animate-fade-up" style={{ animationDelay: '0.5s' }}>
             <Button 
               size="lg" 
               className="gold-gradient text-primary-foreground font-semibold text-lg px-8 shadow-gold hover:opacity-90 transition-opacity"
@@ -66,6 +68,15 @@ const Index = () => {
               Ver Artistas
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            <Link to="/auth">
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="glass-button border-border/50 text-lg px-8"
+              >
+                Área Admin
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -89,65 +100,91 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {artists.map((artist, index) => (
-              <Link
-                key={artist.id}
-                to={`/artista/${artist.slug}`}
-                className="glass-card overflow-hidden hover-lift group"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                {/* Image */}
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={artist.bannerUrl}
-                    alt={artist.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-                  
-                  {/* Play Button */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-16 h-16 rounded-full gold-gradient flex items-center justify-center shadow-gold">
-                      <Play className="w-7 h-7 text-primary-foreground ml-1" />
-                    </div>
+          {isLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="glass-card overflow-hidden animate-pulse">
+                  <div className="aspect-[4/3] bg-muted" />
+                  <div className="p-6">
+                    <div className="h-6 bg-muted rounded w-3/4 mb-2" />
+                    <div className="h-4 bg-muted rounded w-1/2 mb-4" />
+                    <div className="h-4 bg-muted rounded w-full" />
                   </div>
                 </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-display text-2xl font-bold group-hover:text-primary transition-colors">
-                        {artist.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">{artist.genre}</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-primary">
-                      <Star className="w-4 h-4 fill-primary" />
-                      <span className="text-sm font-medium">5.0</span>
+              ))}
+            </div>
+          ) : artists && artists.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {artists.map((artist, index) => (
+                <Link
+                  key={artist.id}
+                  to={`/artista/${artist.slug}`}
+                  className="glass-card overflow-hidden hover-lift group"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  {/* Image */}
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    {artist.banner_url ? (
+                      <img
+                        src={artist.banner_url}
+                        alt={artist.name}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-muted flex items-center justify-center">
+                        <Users className="w-16 h-16 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+                    
+                    {/* Play Button */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-16 h-16 rounded-full gold-gradient flex items-center justify-center shadow-gold">
+                        <Play className="w-7 h-7 text-primary-foreground ml-1" />
+                      </div>
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                    {artist.bio}
-                  </p>
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-display text-2xl font-bold group-hover:text-primary transition-colors">
+                          {artist.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">{artist.genre}</p>
+                      </div>
+                      <div className="flex items-center gap-1 text-primary">
+                        <Star className="w-4 h-4 fill-primary" />
+                        <span className="text-sm font-medium">5.0</span>
+                      </div>
+                    </div>
 
-                  {/* Meta */}
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1.5 text-muted-foreground">
-                      <Calendar className="w-4 h-4 text-primary" />
-                      {artist.projects.length} projetos
-                    </span>
-                    <span className="flex items-center gap-1.5 text-whatsapp font-medium">
-                      <MessageCircle className="w-4 h-4" />
-                      Contratar
-                    </span>
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                      {artist.bio}
+                    </p>
+
+                    {/* Meta */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-1.5 text-muted-foreground">
+                        <Calendar className="w-4 h-4 text-primary" />
+                        Projetos disponíveis
+                      </span>
+                      <span className="flex items-center gap-1.5 text-whatsapp font-medium">
+                        <MessageCircle className="w-4 h-4" />
+                        Contratar
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Nenhum artista encontrado</p>
+            </div>
+          )}
         </div>
       </section>
 
