@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Artist } from '@/hooks/useArtists';
 import { Save, User, Image, Share2, Phone, FileText, Video } from 'lucide-react';
+import { ImageUpload } from './ImageUpload';
 
 interface ArtistInfoFormProps {
   artist: Artist;
@@ -111,37 +112,31 @@ export const ArtistInfoForm = ({ artist, onSave, saving }: ArtistInfoFormProps) 
             Imagens e Vídeo
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="photo_url">Foto Principal (URL)</Label>
-            <Input
-              id="photo_url"
-              value={formData.photo_url}
-              onChange={(e) => handleChange('photo_url', e.target.value)}
-              placeholder="https://..."
-              className="bg-secondary/50 border-border/50"
-            />
-            {formData.photo_url && (
-              <div className="mt-2 w-32 h-32 rounded-lg overflow-hidden bg-secondary/50">
-                <img src={formData.photo_url} alt="Preview" className="w-full h-full object-cover" />
-              </div>
-            )}
+            <Label>Foto Principal</Label>
+            <div className="max-w-xs">
+              <ImageUpload
+                value={formData.photo_url}
+                onChange={(url) => handleChange('photo_url', url)}
+                folder="artists/photos"
+                aspectRatio="square"
+                placeholder="Upload da foto do artista"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="banner_url">Banner (URL)</Label>
-            <Input
-              id="banner_url"
-              value={formData.banner_url}
-              onChange={(e) => handleChange('banner_url', e.target.value)}
-              placeholder="https://..."
-              className="bg-secondary/50 border-border/50"
-            />
-            {formData.banner_url && (
-              <div className="mt-2 w-full max-w-md aspect-[21/9] rounded-lg overflow-hidden bg-secondary/50">
-                <img src={formData.banner_url} alt="Banner Preview" className="w-full h-full object-cover" />
-              </div>
-            )}
+            <Label>Banner</Label>
+            <div className="max-w-lg">
+              <ImageUpload
+                value={formData.banner_url}
+                onChange={(url) => handleChange('banner_url', url)}
+                folder="artists/banners"
+                aspectRatio="banner"
+                placeholder="Upload do banner"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Upload } from 'lucide-react';
+import { ImageUpload } from './ImageUpload';
 
 interface ProjectFormData {
   name: string;
@@ -35,7 +36,8 @@ export const ProjectForm = ({ open, onOpenChange, initialData, onSave, loading }
     photos: []
   });
   const [newSong, setNewSong] = useState('');
-  const [newPhoto, setNewPhoto] = useState('');
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [tempPhotoUrl, setTempPhotoUrl] = useState('');
 
   useEffect(() => {
     if (initialData) {
@@ -64,10 +66,11 @@ export const ProjectForm = ({ open, onOpenChange, initialData, onSave, loading }
     setFormData(prev => ({ ...prev, repertoire: prev.repertoire.filter((_, i) => i !== index) }));
   };
 
-  const handleAddPhoto = () => {
-    if (newPhoto.trim()) {
-      setFormData(prev => ({ ...prev, photos: [...prev.photos, newPhoto.trim()] }));
-      setNewPhoto('');
+  const handleAddPhoto = (url: string) => {
+    if (url.trim()) {
+      setFormData(prev => ({ ...prev, photos: [...prev.photos, url.trim()] }));
+      setShowPhotoUpload(false);
+      setTempPhotoUrl('');
     }
   };
 
@@ -180,19 +183,33 @@ export const ProjectForm = ({ open, onOpenChange, initialData, onSave, loading }
 
           {/* Photos */}
           <div>
-            <Label>Fotos (URLs)</Label>
-            <div className="flex gap-2 mt-1 mb-2">
-              <Input
-                value={newPhoto}
-                onChange={(e) => setNewPhoto(e.target.value)}
-                placeholder="https://..."
-                className="bg-secondary/50"
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddPhoto())}
-              />
-              <Button type="button" variant="outline" onClick={handleAddPhoto} className="shrink-0">
-                <Plus className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-2">
+              <Label>Fotos do Projeto</Label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowPhotoUpload(!showPhotoUpload)}
+              >
+                <Upload className="w-4 h-4 mr-1" />
+                Adicionar Foto
               </Button>
             </div>
+            
+            {showPhotoUpload && (
+              <div className="mb-4 p-4 bg-secondary/20 rounded-lg">
+                <ImageUpload
+                  value={tempPhotoUrl}
+                  onChange={(url) => {
+                    handleAddPhoto(url);
+                  }}
+                  folder="projects"
+                  aspectRatio="video"
+                  placeholder="Upload da foto do projeto"
+                />
+              </div>
+            )}
+            
             <div className="grid grid-cols-4 gap-2">
               {formData.photos.map((photo, index) => (
                 <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
