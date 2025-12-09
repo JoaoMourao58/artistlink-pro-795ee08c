@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ImageUpload } from './ImageUpload';
 
 interface MediaFormData {
   url: string;
@@ -49,19 +50,30 @@ export const MediaForm = ({ open, onOpenChange, type, initialData, onSave, loadi
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div>
-            <Label htmlFor="url">
-              {type === 'photo' ? 'URL da Imagem' : 'URL do Vídeo (YouTube Embed)'}
-            </Label>
-            <Input
-              id="url"
-              value={formData.url}
-              onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-              placeholder={type === 'photo' ? 'https://images.unsplash.com/...' : 'https://www.youtube.com/embed/...'}
-              className="mt-1 bg-secondary/50"
-              required
-            />
-          </div>
+          {type === 'photo' ? (
+            <div>
+              <Label>Imagem</Label>
+              <ImageUpload
+                value={formData.url}
+                onChange={(url) => setFormData(prev => ({ ...prev, url }))}
+                folder="gallery"
+                aspectRatio="video"
+                placeholder="Upload da foto"
+              />
+            </div>
+          ) : (
+            <div>
+              <Label htmlFor="url">URL do Vídeo (YouTube Embed)</Label>
+              <Input
+                id="url"
+                value={formData.url}
+                onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                placeholder="https://www.youtube.com/embed/..."
+                className="mt-1 bg-secondary/50"
+                required
+              />
+            </div>
+          )}
 
           <div>
             <Label htmlFor="label">
@@ -79,19 +91,15 @@ export const MediaForm = ({ open, onOpenChange, type, initialData, onSave, loadi
             />
           </div>
 
-          {/* Preview */}
-          {formData.url && (
+          {/* Video Preview */}
+          {type === 'video' && formData.url && (
             <div className="rounded-lg overflow-hidden bg-secondary/30">
-              {type === 'photo' ? (
-                <img src={formData.url} alt="Preview" className="w-full aspect-video object-cover" />
-              ) : (
-                <iframe
-                  src={formData.url}
-                  title="Preview"
-                  className="w-full aspect-video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                />
-              )}
+              <iframe
+                src={formData.url}
+                title="Preview"
+                className="w-full aspect-video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
             </div>
           )}
 
