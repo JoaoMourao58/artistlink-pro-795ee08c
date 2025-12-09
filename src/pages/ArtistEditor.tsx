@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
-import { useArtist, useArtistProjects, useArtistPhotos, useArtistVideos, useArtistShows, Project, Photo, Video, Show } from '@/hooks/useArtists';
+import { useArtist, useArtistProjects, useArtistPhotos, useArtistVideos, useArtistShows, Artist, Project, Photo, Video, Show } from '@/hooks/useArtists';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
@@ -28,9 +28,10 @@ import { ProjectForm } from '@/components/dashboard/ProjectForm';
 import { MediaForm } from '@/components/dashboard/MediaForm';
 import { ShowForm } from '@/components/dashboard/ShowForm';
 import { ShowsCalendar } from '@/components/dashboard/ShowsCalendar';
+import { ArtistInfoForm } from '@/components/dashboard/ArtistInfoForm';
 import { 
   ArrowLeft, Plus, Music, Image, Video as VideoIcon, 
-  Calendar as CalendarIcon, Clock, Save, Eye
+  Calendar as CalendarIcon, Clock, Save, Eye, User
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -292,6 +293,24 @@ const ArtistEditor = () => {
     }
   };
 
+  const handleSaveArtistInfo = async (data: Partial<Artist>) => {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('artists')
+        .update(data)
+        .eq('id', artist?.id);
+      if (error) throw error;
+      toast({ title: 'Informações atualizadas!' });
+      queryClient.invalidateQueries({ queryKey: ['artist', slug] });
+      queryClient.invalidateQueries({ queryKey: ['artists'] });
+    } catch (error) {
+      toast({ title: 'Erro ao salvar informações', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (authLoading || artistLoading || !artist) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -327,8 +346,12 @@ const ArtistEditor = () => {
       </header>
 
       <main className="container py-8">
-        <Tabs defaultValue="projects" className="space-y-6">
-          <TabsList className="bg-secondary/50">
+        <Tabs defaultValue="info" className="space-y-6">
+          <TabsList className="bg-secondary/50 flex-wrap">
+            <TabsTrigger value="info" className="gap-2">
+              <User className="w-4 h-4" />
+              Informações
+            </TabsTrigger>
             <TabsTrigger value="projects" className="gap-2">
               <Music className="w-4 h-4" />
               Projetos
@@ -346,6 +369,15 @@ const ArtistEditor = () => {
               Agenda
             </TabsTrigger>
           </TabsList>
+
+          {/* Info Tab */}
+          <TabsContent value="info">
+            <ArtistInfoForm 
+              artist={artist} 
+              onSave={handleSaveArtistInfo}
+              saving={saving}
+            />
+          </TabsContent>
 
           {/* Projects Tab */}
           <TabsContent value="projects" className="space-y-4">
