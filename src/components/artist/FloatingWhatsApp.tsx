@@ -1,20 +1,28 @@
 import { MessageCircle } from 'lucide-react';
+import { useWhatsAppLink } from '@/hooks/useWhatsAppLink';
 
 interface FloatingWhatsAppProps {
-  whatsappNumber: string;
+  artistId: string;
   artistName: string;
 }
 
-export const FloatingWhatsApp = ({ whatsappNumber, artistName }: FloatingWhatsAppProps) => {
-  const handleClick = () => {
-    const message = encodeURIComponent(`Olá! Gostaria de informações sobre contratação do show de ${artistName}.`);
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+export const FloatingWhatsApp = ({ artistId, artistName }: FloatingWhatsAppProps) => {
+  const whatsAppLink = useWhatsAppLink();
+
+  const handleClick = async () => {
+    try {
+      const link = await whatsAppLink.mutateAsync({ artistId, artistName });
+      window.open(link, '_blank');
+    } catch (error) {
+      console.error('Error getting WhatsApp link:', error);
+    }
   };
 
   return (
     <button
       onClick={handleClick}
-      className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-whatsapp hover:bg-whatsapp/90 flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 animate-pulse-gold group"
+      disabled={whatsAppLink.isPending}
+      className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-whatsapp hover:bg-whatsapp/90 flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 animate-pulse-gold group disabled:opacity-50"
       aria-label="Contratar via WhatsApp"
     >
       <MessageCircle className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />

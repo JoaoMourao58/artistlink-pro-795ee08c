@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export interface Artist {
+// Public artist interface (without whatsapp_number for security)
+export interface ArtistPublic {
   id: string;
   slug: string;
   name: string;
@@ -11,12 +12,16 @@ export interface Artist {
   banner_url: string | null;
   photo_url: string | null;
   main_video_url: string | null;
-  whatsapp_number: string;
   press_kit_url: string | null;
   social_links: Record<string, string>;
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+// Full artist interface (for admin use only)
+export interface Artist extends ArtistPublic {
+  whatsapp_number: string;
 }
 
 export interface Project {
@@ -82,9 +87,28 @@ export const useArtists = () => {
   });
 };
 
+// Hook for public artist page (uses view without whatsapp)
 export const useArtist = (slug: string) => {
   return useQuery({
-    queryKey: ['artist', slug],
+    queryKey: ['artist-public', slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('artists_public')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data as ArtistPublic | null;
+    },
+    enabled: !!slug
+  });
+};
+
+// Hook for admin pages (requires admin role)
+export const useArtistAdmin = (slug: string) => {
+  return useQuery({
+    queryKey: ['artist-admin', slug],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('artists')
