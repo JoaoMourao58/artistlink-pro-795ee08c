@@ -95,6 +95,13 @@ export type Database = {
             referencedRelation: "artists"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "button_clicks_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       leads: {
@@ -142,6 +149,13 @@ export type Database = {
             referencedRelation: "artists"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "leads_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       page_views: {
@@ -172,6 +186,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_views_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_public"
             referencedColumns: ["id"]
           },
         ]
@@ -207,6 +228,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photos_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_public"
             referencedColumns: ["id"]
           },
         ]
@@ -289,6 +317,13 @@ export type Database = {
             referencedRelation: "artists"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "projects_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       shows: {
@@ -333,6 +368,13 @@ export type Database = {
             referencedRelation: "artists"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "shows_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       testimonials: {
@@ -371,6 +413,13 @@ export type Database = {
             referencedRelation: "artists"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "testimonials_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       videos: {
@@ -406,11 +455,68 @@ export type Database = {
             referencedRelation: "artists"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "videos_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      artists_public: {
+        Row: {
+          banner_url: string | null
+          bio: string | null
+          created_at: string | null
+          full_bio: string | null
+          genre: string | null
+          id: string | null
+          is_active: boolean | null
+          main_video_url: string | null
+          name: string | null
+          photo_url: string | null
+          press_kit_url: string | null
+          slug: string | null
+          social_links: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          banner_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          full_bio?: string | null
+          genre?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          main_video_url?: string | null
+          name?: string | null
+          photo_url?: string | null
+          press_kit_url?: string | null
+          slug?: string | null
+          social_links?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          banner_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          full_bio?: string | null
+          genre?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          main_video_url?: string | null
+          name?: string | null
+          photo_url?: string | null
+          press_kit_url?: string | null
+          slug?: string | null
+          social_links?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
