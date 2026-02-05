@@ -202,7 +202,7 @@ const Index = () => {
             <Button 
               size="lg" 
               className="whatsapp-button text-lg"
-              onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
+              onClick={() => window.open('https://wa.me/5562981290498?text=Olá! Gostaria de informações sobre contratação de shows.', '_blank')}
             >
               <MessageCircle className="mr-2 h-5 w-5" />
               Falar com JC Shows
