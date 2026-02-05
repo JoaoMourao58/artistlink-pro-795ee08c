@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useArtist, useArtistProjects, useArtistShows, useTrackPageView, useTrackButtonClick } from '@/hooks/useArtists';
+import { useWhatsAppLink } from '@/hooks/useWhatsAppLink';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Clock, Users, Calendar, MapPin, Music, Play, CheckCircle, QrCode } from 'lucide-react';
@@ -13,6 +14,7 @@ const ContractorMode = () => {
   const { data: shows } = useArtistShows(artist?.id || '');
   const trackPageView = useTrackPageView();
   const trackButtonClick = useTrackButtonClick();
+  const whatsAppLink = useWhatsAppLink();
 
   useEffect(() => {
     if (artist?.id) {
@@ -20,11 +22,18 @@ const ContractorMode = () => {
     }
   }, [artist?.id]);
 
-  const handleWhatsApp = () => {
+  const handleWhatsApp = async () => {
     if (!artist) return;
     trackButtonClick.mutate({ artistId: artist.id, buttonType: 'whatsapp_contractor' });
-    const message = encodeURIComponent(`Olá! Estou interessado em contratar o show de ${artist.name}. Gostaria de mais informações sobre valores e disponibilidade.`);
-    window.open(`https://wa.me/${artist.whatsapp_number}?text=${message}`, '_blank');
+    try {
+      const link = await whatsAppLink.mutateAsync({ 
+        artistId: artist.id, 
+        artistName: artist.name 
+      });
+      window.open(link, '_blank');
+    } catch (error) {
+      console.error('Error getting WhatsApp link:', error);
+    }
   };
 
   const availableDates = shows?.filter(s => s.status === 'available') || [];

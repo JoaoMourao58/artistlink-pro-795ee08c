@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
-import { useArtist, useArtistProjects, useArtistPhotos, useArtistVideos, useArtistShows, Artist, Project, Photo, Video, Show } from '@/hooks/useArtists';
+import { useArtistAdmin, useArtistProjects, useArtistPhotos, useArtistVideos, useArtistShows, Artist, Project, Photo, Video, Show } from '@/hooks/useArtists';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
@@ -51,7 +51,7 @@ const ArtistEditor = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: artist, isLoading: artistLoading } = useArtist(slug || '');
+  const { data: artist, isLoading: artistLoading } = useArtistAdmin(slug || '');
   const { data: projects } = useArtistProjects(artist?.id || '');
   const { data: photos } = useArtistPhotos(artist?.id || '');
   const { data: videos } = useArtistVideos(artist?.id || '');
@@ -302,8 +302,8 @@ const ArtistEditor = () => {
         .eq('id', artist?.id);
       if (error) throw error;
       toast({ title: 'Informações atualizadas!' });
-      queryClient.invalidateQueries({ queryKey: ['artist', slug] });
-      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      queryClient.invalidateQueries({ queryKey: ['artist-admin', slug] });
+      queryClient.invalidateQueries({ queryKey: ['artist-public', slug] });
     } catch (error) {
       toast({ title: 'Erro ao salvar informações', variant: 'destructive' });
     } finally {

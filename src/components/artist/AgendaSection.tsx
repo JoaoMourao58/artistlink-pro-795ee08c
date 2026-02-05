@@ -1,6 +1,7 @@
 import { Calendar, MapPin, CheckCircle, Clock } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useWhatsAppLink } from '@/hooks/useWhatsAppLink';
 
 interface Show {
   id: string;
@@ -12,16 +13,25 @@ interface Show {
 
 interface AgendaSectionProps {
   shows: Show[];
-  whatsappNumber: string;
+  artistId: string;
   artistName: string;
 }
 
-export const AgendaSection = ({ shows, whatsappNumber, artistName }: AgendaSectionProps) => {
-  const handleBookDate = (show: Show) => {
-    const message = encodeURIComponent(
-      `Olá! Gostaria de verificar disponibilidade de ${artistName} para a data ${format(parseISO(show.date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })} em ${show.city}.`
-    );
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+export const AgendaSection = ({ shows, artistId, artistName }: AgendaSectionProps) => {
+  const whatsAppLink = useWhatsAppLink();
+
+  const handleBookDate = async (show: Show) => {
+    try {
+      const link = await whatsAppLink.mutateAsync({ artistId, artistName });
+      // Modify the link to include the specific date message
+      const baseUrl = link.split('?')[0];
+      const message = encodeURIComponent(
+        `Olá! Gostaria de verificar disponibilidade de ${artistName} para a data ${format(parseISO(show.date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })} em ${show.city}.`
+      );
+      window.open(`${baseUrl}?text=${message}`, '_blank');
+    } catch (error) {
+      console.error('Error getting WhatsApp link:', error);
+    }
   };
 
   return (
@@ -74,7 +84,8 @@ export const AgendaSection = ({ shows, whatsappNumber, artistName }: AgendaSecti
                 ) : (
                   <button
                     onClick={() => handleBookDate(show)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-whatsapp/20 text-whatsapp text-sm font-medium hover:bg-whatsapp/30 transition-colors"
+                    disabled={whatsAppLink.isPending}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-whatsapp/20 text-whatsapp text-sm font-medium hover:bg-whatsapp/30 transition-colors disabled:opacity-50"
                   >
                     <Clock className="w-4 h-4" />
                     Data Disponível

@@ -1,20 +1,30 @@
 import { Play, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useWhatsAppLink } from '@/hooks/useWhatsAppLink';
 
 interface HeroSectionProps {
   artist: {
+    id: string;
     name: string;
     genre: string;
     bio: string;
     bannerUrl: string;
-    whatsappNumber: string;
   };
 }
 
 export const HeroSection = ({ artist }: HeroSectionProps) => {
-  const handleWhatsApp = () => {
-    const message = encodeURIComponent(`Olá! Gostaria de informações sobre contratação do show de ${artist.name}.`);
-    window.open(`https://wa.me/${artist.whatsappNumber}?text=${message}`, '_blank');
+  const whatsAppLink = useWhatsAppLink();
+
+  const handleWhatsApp = async () => {
+    try {
+      const link = await whatsAppLink.mutateAsync({ 
+        artistId: artist.id, 
+        artistName: artist.name 
+      });
+      window.open(link, '_blank');
+    } catch (error) {
+      console.error('Error getting WhatsApp link:', error);
+    }
   };
 
   return (
@@ -51,6 +61,7 @@ export const HeroSection = ({ artist }: HeroSectionProps) => {
               onClick={handleWhatsApp}
               size="lg"
               className="whatsapp-button group text-lg"
+              disabled={whatsAppLink.isPending}
             >
               <MessageCircle className="mr-2 h-5 w-5 group-hover:animate-pulse" />
               Contratar Show

@@ -58,7 +58,6 @@ const ArtistPage = () => {
     bio: artist.bio,
     bannerUrl: artist.banner_url || '',
     mainVideoUrl: artist.main_video_url || '',
-    whatsappNumber: artist.whatsapp_number,
     socialLinks: (artist.social_links || {}) as Record<string, string>,
     pressKitUrl: artist.press_kit_url
   };
@@ -95,7 +94,10 @@ const ArtistPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <HeroSection artist={artistData} />
+      <HeroSection artist={{
+        id: artistData.id,
+        ...artistData
+      }} />
       
       {artistData.mainVideoUrl && (
         <VideoSection mainVideoUrl={artistData.mainVideoUrl} artistName={artistData.name} />
@@ -108,7 +110,7 @@ const ArtistPage = () => {
       {showsData.length > 0 && (
         <AgendaSection 
           shows={showsData} 
-          whatsappNumber={artistData.whatsappNumber} 
+          artistId={artistData.id}
           artistName={artistData.name} 
         />
       )}
@@ -131,7 +133,7 @@ const ArtistPage = () => {
       
       <PressKitSection artistName={artistData.name} pressKitUrl={artistData.pressKitUrl} />
       <Footer />
-      <FloatingWhatsApp whatsappNumber={artistData.whatsappNumber} artistName={artistData.name} />
+      <FloatingWhatsApp artistId={artistData.id} artistName={artistData.name} />
     </div>
   );
 };
