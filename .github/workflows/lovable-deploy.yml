@@ -16,12 +16,12 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       # 1. Faz o checkout do codigo do seu repositorio
       - name: "Checkout do Repositorio"
         uses: actions/checkout@v4
-      
+
       # 2. Configura o ambiente Node.js
       # (Esta e a forma moderna de usar "npm" no GitHub Actions)
       - name: "Configurar Node.js"
@@ -29,16 +29,22 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      
+
       # 3. Instala as dependencias
       # (Usar 'npm ci' e mais rapido e seguro para CI)
       - name: "Instalar Dependencias"
         run: npm ci
-      
+
       # 4. Roda o script de build (que deve gerar a pasta 'dist')
       - name: "Rodar Build"
         run: npm run build
-      
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          # Nome novo (recomendado): VITE_SUPABASE_PUBLISHABLE_KEY
+          # Nome antigo (compatibilidade): VITE_SUPABASE_ANON_KEY
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+
       # 5. Faz o deploy da pasta 'dist' para a branch 'stable-website'
       - name: "Deploy para a Branch stable-website"
         uses: JamesIves/github-pages-deploy-action@v4
