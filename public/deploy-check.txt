@@ -1,3 +1,5 @@
 DEPLOY CHECK - ArtistLink Pro
-Data: 2026-02-08
+Data: 2026-02-08 14:46
+Repositorio: artistlink-pro-795ee08c
+Branch: stable-website
 Se você está lendo isso pelo navegador, o deploy novo chegou no servidor.
