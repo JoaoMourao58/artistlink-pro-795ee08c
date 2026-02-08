@@ -1,0 +1,9 @@
+# Redireciona www para domínio raiz
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^www\.jcshowseeventos\.com\.br$ [NC]
+RewriteRule ^(.*)$ https://jcshowseeventos.com.br/$1 [R=301,L]
+
+# Suporte para SPA (Single Page Application)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
