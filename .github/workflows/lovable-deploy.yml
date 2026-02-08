@@ -38,6 +38,9 @@ jobs:
       # 4. Roda o script de build (que deve gerar a pasta 'dist')
       - name: "Rodar Build"
         run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
       
       # 5. Faz o deploy da pasta 'dist' para a branch 'stable-website'
       - name: "Deploy para a Branch stable-website"
